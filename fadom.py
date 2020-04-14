@@ -18,6 +18,7 @@ from gevent import monkey
 monkey.patch_all()
 from gevent.pool import Pool
 from gevent.queue import PriorityQueue
+import nmap
 
 class faDom:
   
@@ -273,15 +274,33 @@ def wildcard_test(dns_servers, domain, level=1):
     except Exception as e:
         return domain
 
+def _nmap():
+    try:
+        ips = []
+        f = open(os.path.join(path, ipFileName), 'r')
+        for lines in f:
+            ips.append(lines.strip())
+            f.close
+        print('[ + ] ARQUIVO IMPORTADO PARA O NMAP COM SUCESSO!')
+
+    except:
+        print('[ - ] FALHA AO ABRIR ARQUIVO!')
+    
+    return ips
+
 
 if __name__ == '__main__':
-    parser = optparse.OptionParser(version=1.1)
+    parser = optparse.OptionParser(version=1.3)
     parser.add_option('-f', dest='file', default='subnames.txt',
                       help='Arquivo de dicionário, padrão: subnames.txt.')
     parser.add_option('--full', dest='full_scan', default=False, action='store_true',
                       help='Para executar o bruteforce completo, full_subnames.txt será usado como arquivo de dicionário')
     parser.add_option('-t', '--threads', dest='threads', default=100, type=int,
                       help='Número de threads de verificação, 100 por padrão')
+    parser.add_option('-p', '--port', dest='range_ports', type=str, help='Range de portas a ser escaneado, separados por - ')
+
+    parser.add_option('-n', '--nmap', dest='output_name',
+                      help='Executar um scan após toda varredura')
 
     (options, args) = parser.parse_args()
     if len(args) < 1:
@@ -320,7 +339,8 @@ if __name__ == '__main__':
 
     
     ipFileName = args[0] + '-ip.txt'
-    subDomainsFileName = args[0] + '-subdominios.txt'    
+    subDomainsFileName = args[0] + '-subdominios.txt'
+    csvFile = options.output_name    
     
     with open(os.path.join(path, ipFileName), 'w') as f:
         for ip in d.ip_dict:
@@ -330,7 +350,41 @@ if __name__ == '__main__':
         for domain in d.found_sub:
             f.write(domain + '\n')
 
-    print('[*] Programa rodou por %.1f segundos ' % (time.time() - d.start_time))
 
+    with open(os.path.join(path,csvFile + '.csv'), 'w') as y:
+        nm = nmap.PortScanner()
+        print('[ + ] Iniciando NMAP ')
+        for x in _nmap():
+            nm.scan(x, options.range_ports )
+            
+
+            for host in nm.all_hosts():
+                
+                if nm[host].state() != 'up':
+                    print(f'Host : {host} {nm[host].hostname()} não disponivel')
+
+                else:
+                    
+                    print(nm.command_line())
+                    print('------------------------------------')
+                    print(f'Host : {host} {nm[host].hostname()}')
+                    print(f'Is : {nm[host].state()}')
+                    for proto in nm[host].all_protocols():
+                        print('-------')
+                        print(f'Protocolo : {proto}')
+                
+                        lport = nm[host][proto].keys()
+                        for port in lport:
+                            print (f"port : {port}\tstate : {nm[host][proto][port]['state']}")
+                    
+                    print('\n')
+
+                y.write(nm.csv() + '\n')
+
+
+    
+    print('[*] Programa rodou por %.1f segundos ' % (time.time() - d.start_time))
+    y.close
     d.outfile.flush()
     d.outfile.close()
+    

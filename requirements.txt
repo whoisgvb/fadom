@@ -8,3 +8,5 @@ CPython
 requests
 dnspython
 gevent
+simplejson
+nmap

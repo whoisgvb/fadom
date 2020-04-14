@@ -9,4 +9,4 @@ requests
 dnspython
 gevent
 simplejson
-nmap
+python-nmap

@@ -297,9 +297,9 @@ if __name__ == '__main__':
                       help='Para executar o bruteforce completo, full_subnames.txt será usado como arquivo de dicionário')
     parser.add_option('-t', '--threads', dest='threads', default=100, type=int,
                       help='Número de threads de verificação, 100 por padrão')
-    parser.add_option('-p', '--port', dest='range_ports', type=str, help='Range de portas a ser escaneado, separados por - ')
+    parser.add_option('-p', '--port', dest='range_ports',default=False, type=str, help='Range de portas a ser escaneado, separados por - ')
 
-    parser.add_option('-n', '--nmap', dest='output_name',
+    parser.add_option('-n', '--nmap', dest='output_name', default=False,
                       help='Executar um scan após toda varredura')
 
     (options, args) = parser.parse_args()

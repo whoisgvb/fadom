@@ -21,6 +21,8 @@
 
 + Wordlists para subsubdominios
 
++ Scan automatizado após trazer os resultados
+
 ```
 ### Requisitos de instalação
 ```
@@ -32,19 +34,23 @@ pip3 install --user -r requirements.txt
 ```
 Usage: fadom.py [OPTIONS]
 
-  -h, --help            show this help message and exit.
+  -h, --help            show this help message and exit
   -f FILE               Arquivo de dicionário, padrão: subnames.txt.
   --full                Para executar o bruteforce completo, full_subnames.txt
-                        será usado como arquivo de dicionário.
+                        será usado como arquivo de dicionário
   -t THREADS, --threads=THREADS
-                        Número de threads de verificação, 100 por padrão.
+                        Número de threads de verificação, 100 por padrão
+  -p RANGE_PORTS, --port=RANGE_PORTS
+                        Range de portas a ser escaneado
+  -n OUTPUT_NAME, --nmap=OUTPUT_NAME
+                        Executar um scan após toda varredura
 
 ```
 
 ### Exemplos
 
 ```
-python3 fadom.py google.com.br -t 500 --full
+python3 fadom.py google.com.br -t 500 --full -n nmapoutput -p 20-1024
 
 [ ! ] Para melhores resultados você pode adicionar mais  servidores DNS ao arquivo "dir/serversDNS.txt"
 ```

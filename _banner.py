@@ -6,7 +6,7 @@ def Banner():
 `$$$"``c$$$cc$$$c $$,    $$$$$,     $$$$$$$$$$$"$$$ 
  888    888   888,888_,o8P'"888,_ _,88P888 Y88" 888o
  "MM,   YMM   ""` MMMMP"`    "YMMMMMP" MMM  M'  "MMM
-                    Versão 1.1
+                    Versão 1.3
 
          ~ Feito com amor para o Koku & Fig <3 ~        
   """)

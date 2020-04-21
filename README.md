@@ -50,9 +50,12 @@ Usage: fadom.py [OPTIONS]
 ### Exemplos
 
 ```
+python3 fadom.py google.com.br -t 300
 python3 fadom.py google.com.br -t 500 --full -n nmapoutput -p 20-1024
 
+
 [ ! ] Para melhores resultados você pode adicionar mais  servidores DNS ao arquivo "dir/serversDNS.txt"
+      e/ou customizar as Wordlists =)
 ```
 
 ### Contato

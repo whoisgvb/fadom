@@ -286,6 +286,7 @@ def _nmap():
     except:
         print('[ - ] FALHA AO ABRIR ARQUIVO!')
     
+
     return ips
 
 
@@ -297,11 +298,12 @@ if __name__ == '__main__':
                       help='Para executar o bruteforce completo, full_subnames.txt será usado como arquivo de dicionário')
     parser.add_option('-t', '--threads', dest='threads', default=100, type=int,
                       help='Número de threads de verificação, 100 por padrão')
-    parser.add_option('-p', '--port', dest='range_ports',default=False, type=str, help='Range de portas a ser escaneado, separados por - ')
+    parser.add_option('-p', '--port', dest='range_ports', type=str, help='Range de portas a ser escaneado, separados por - ')
 
-    parser.add_option('-n', '--nmap', dest='output_name', default=False,
+    parser.add_option('-n', '--nmap', dest='output_name', type=str,
                       help='Executar um scan após toda varredura')
 
+    
     (options, args) = parser.parse_args()
     if len(args) < 1:
         parser.print_help()
@@ -350,41 +352,42 @@ if __name__ == '__main__':
         for domain in d.found_sub:
             f.write(domain + '\n')
 
+    if options.output_name and options.range_ports:
+            with open(os.path.join(path,csvFile + '.csv'), 'w') as y:
+                nm = nmap.PortScanner()
+                print('[ + ] Iniciando NMAP ')
+                for x in _nmap():
+                    nm.scan(x, options.range_ports )
 
-    with open(os.path.join(path,csvFile + '.csv'), 'w') as y:
-        nm = nmap.PortScanner()
-        print('[ + ] Iniciando NMAP ')
-        for x in _nmap():
-            nm.scan(x, options.range_ports )
-            
+                    for host in nm.all_hosts():
+                        
+                        if nm[host].state() != 'up':
+                            print(f'Host : {host} {nm[host].hostname()} não disponivel')
 
-            for host in nm.all_hosts():
-                
-                if nm[host].state() != 'up':
-                    print(f'Host : {host} {nm[host].hostname()} não disponivel')
+                        else:
+                            
+                            print(nm.command_line())
+                            print('------------------------------------')
+                            print(f'Host : {host} {nm[host].hostname()}')
+                            print(f'Is : {nm[host].state()}')
+                            for proto in nm[host].all_protocols():
+                                print('-------')
+                                print(f'Protocolo : {proto}')
+                        
+                                lport = nm[host][proto].keys()
+                                for port in lport:
+                                    print (f"port : {port}\tstate : {nm[host][proto][port]['state']}")
+                            
+                            print('\n')
 
-                else:
-                    
-                    print(nm.command_line())
-                    print('------------------------------------')
-                    print(f'Host : {host} {nm[host].hostname()}')
-                    print(f'Is : {nm[host].state()}')
-                    for proto in nm[host].all_protocols():
-                        print('-------')
-                        print(f'Protocolo : {proto}')
-                
-                        lport = nm[host][proto].keys()
-                        for port in lport:
-                            print (f"port : {port}\tstate : {nm[host][proto][port]['state']}")
-                    
-                    print('\n')
-
-                y.write(nm.csv() + '\n')
+                        y.write(nm.csv() + '\n')
+            y.close
 
 
     
+    
     print('[*] Programa rodou por %.1f segundos ' % (time.time() - d.start_time))
-    y.close
+   
     d.outfile.flush()
     d.outfile.close()
     
